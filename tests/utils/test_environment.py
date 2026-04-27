@@ -574,3 +574,22 @@ def test_validate_version_constraints_handles_empty_stderr():
         with pytest.raises(MlflowException, match="incompatible"):
             _validate_version_constraints(["foo==1.0"])
         mock_run.assert_called_once()
+
+
+def test_validate_version_constraints_skipped_via_env_var(monkeypatch):
+    monkeypatch.setenv("MLFLOW_DISABLE_PIP_REQUIREMENTS_VALIDATION", "true")
+    with (
+        mock.patch("mlflow.utils.environment.subprocess.run") as mock_run,
+        mock.patch("mlflow.utils.environment._logger.info") as mock_info,
+    ):
+        _validate_version_constraints(["foo==1.0", "foo==2.0"])
+        mock_run.assert_not_called()
+        mock_info.assert_called_once()
+        assert "MLFLOW_DISABLE_PIP_REQUIREMENTS_VALIDATION" in mock_info.call_args.args[0]
+
+
+def test_validate_version_constraints_runs_when_env_var_unset(monkeypatch):
+    monkeypatch.delenv("MLFLOW_DISABLE_PIP_REQUIREMENTS_VALIDATION", raising=False)
+    with mock.patch("mlflow.utils.environment.subprocess.run") as mock_run:
+        _validate_version_constraints(["foo==1.0"])
+        mock_run.assert_called_once()

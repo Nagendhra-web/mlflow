@@ -18,6 +18,7 @@ from packaging.version import Version
 from mlflow.environment_variables import (
     _MLFLOW_ACTIVE_MODEL_ID,
     _MLFLOW_TESTING,
+    MLFLOW_DISABLE_PIP_REQUIREMENTS_VALIDATION,
     MLFLOW_EXPERIMENT_ID,
     MLFLOW_INPUT_EXAMPLE_INFERENCE_TIMEOUT,
     MLFLOW_LOCK_MODEL_DEPENDENCIES,
@@ -957,6 +958,13 @@ def _validate_version_constraints(requirements):
         _validate_version_constraints(["tensorflow<2.0", "tensorflow>2.3"])
         # This will raise an exception due to boundary validity.
     """
+    if MLFLOW_DISABLE_PIP_REQUIREMENTS_VALIDATION.get():
+        _logger.info(
+            "Skipping pip dependency validation because "
+            "MLFLOW_DISABLE_PIP_REQUIREMENTS_VALIDATION is set."
+        )
+        return
+
     with tempfile.NamedTemporaryFile(mode="w+", delete=False) as tmp_file:
         tmp_file.write("\n".join(requirements))
         tmp_file_name = tmp_file.name

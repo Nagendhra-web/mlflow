@@ -863,6 +863,15 @@ MLFLOW_REQUIREMENTS_INFERENCE_RAISE_ERRORS = _BooleanEnvironmentVariable(
     "MLFLOW_REQUIREMENTS_INFERENCE_RAISE_ERRORS", False
 )
 
+#: If set to True, ``mlflow.<flavor>.log_model`` and ``save_model`` will skip the
+#: ``pip install --dry-run`` version-conflict check performed by
+#: ``_validate_version_constraints``. This is intended as an explicit opt-out for users in
+#: air-gapped or otherwise restricted environments where pip cannot reach a package index.
+#: When the environment variable is set, the requirements are logged as-is without validation.
+MLFLOW_DISABLE_PIP_REQUIREMENTS_VALIDATION = _BooleanEnvironmentVariable(
+    "MLFLOW_DISABLE_PIP_REQUIREMENTS_VALIDATION", False
+)
+
 # How many traces to display in Databricks Notebooks
 MLFLOW_MAX_TRACES_TO_DISPLAY_IN_NOTEBOOK = _EnvironmentVariable(
     "MLFLOW_MAX_TRACES_TO_DISPLAY_IN_NOTEBOOK", int, 10
